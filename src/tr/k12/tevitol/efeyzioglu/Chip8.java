@@ -72,6 +72,10 @@ public class Chip8 implements Runnable{
 				break;
 			case 0x2000:
 				break;
+			default:
+				System.err.println("Unsupported opcode, skipping");
+				i++;
+				break;
 			}
 		}
 	}
