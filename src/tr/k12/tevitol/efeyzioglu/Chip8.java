@@ -87,6 +87,30 @@ public class Chip8 implements Runnable{
 					i++;
 				break;
 			
+			case 0x4000://4xkk: If Vx != kk, skip next instruction
+				if((registers[memory[i] & 0x0F00] >> 8) != (memory[i] & 0x00FF))
+					i+=2;
+				else
+					i++;
+				break;
+			
+			case 0x5000://5xy0: If Vx == Vy, skip next instruction
+				if(registers[(memory[i] & 0x0F00) >> 8] == registers[(memory[i] & 0x00F0) >> 4])
+					i+=2;
+				else
+					i++;
+				break;
+				
+			case 0x6000://6xkk: Load kk into Vx
+				registers[(memory[i] & 0x0F00) >> 8] = (byte) (memory[i] & 0x00FF);
+				i++;
+				break;
+				
+			case 0x7000://7xkk: Increment Vx by kk
+				registers[(memory[i] & 0x0F00 >> 8)] += (memory[i] & 0x00FF);
+				i++;
+				break;
+				
 			default:
 				System.err.println("Unsupported opcode, skipping");
 				i++;
