@@ -111,6 +111,33 @@ public class Chip8 implements Runnable{
 				i++;
 				break;
 				
+			case 0x8000:
+				switch(memory[i] & 0x000F){
+				case 1://8xy1: Set Vx to Vx OR Vy
+					registers[(memory[i] & 0x0F00) >> 8] |= registers[(memory[i] & 0x00F0) >> 4];
+					i++;
+					break;
+				case 2://8xy2: Set Vx to Vx AND Vy
+					registers[(memory[i] & 0x0F00) >> 8] &= registers[(memory[i] & 0x00F0) >> 4];
+					i++;
+					break;
+				case 3://8xy3: Set Vx to Vx XOR Vy
+					registers[(memory[i] & 0x0F00) >> 8] ^= registers[(memory[i] & 0x00F0) >> 4];
+					i++;
+					break;
+				case 4://8xy4: Increment Vx by Vy, if carry is generated set VF to 1, otherwise clear VF.
+					byte sum = (byte) (registers[(memory[i] & 0x0F00) >> 8] + registers[(memory[i] & 0x00F0) >> 4]);
+					if(sum > 0xFF) registers[0xF] = 1;
+					else registers[0xF] = 0;
+					registers[(memory[i] & 0x0F00) >> 8] = (byte) sum;
+					i++;
+					break;
+				default:
+					System.err.println("Unsupported opcode, skipping");
+					i++;
+					break;
+				}
+				break;
 			default:
 				System.err.println("Unsupported opcode, skipping");
 				i++;
