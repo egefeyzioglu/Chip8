@@ -70,7 +70,9 @@ public class Chip8 implements Runnable{
 			case 0x1000://1nnn: Jump to address nnn
 				i = memory[i] & 0x0FFF;
 				break;
-			case 0x2000:
+			case 0x2000://2nnn: Call subroutine at address nnn
+				stack[++stackPointer] = (char) i;
+				i = memory[i] & 0x0FFF;
 				break;
 			default:
 				System.err.println("Unsupported opcode, skipping");
