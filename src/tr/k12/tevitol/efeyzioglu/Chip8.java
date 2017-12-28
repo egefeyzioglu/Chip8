@@ -31,6 +31,9 @@ public class Chip8 implements Runnable{
 	 * Delay timer
 	 */
 	int DT;
+	/**
+	 * Also referred to as V
+	 */
 	byte[] registers;
 	/**
 	 * The stack is a 16-deep array of 16 bit values<br/>
@@ -67,13 +70,23 @@ public class Chip8 implements Runnable{
 					}
 				}
 				break;
+			
 			case 0x1000://1nnn: Jump to address nnn
 				i = memory[i] & 0x0FFF;
 				break;
+			
 			case 0x2000://2nnn: Call subroutine at address nnn
 				stack[++stackPointer] = (char) i;
 				i = memory[i] & 0x0FFF;
 				break;
+			
+			case 0x3000://3xkk: If Vx == kk, skip next instruction
+				if((registers[memory[i] & 0x0F00] >> 8) == (memory[i] & 0x00FF))
+					i+=2;
+				else
+					i++;
+				break;
+			
 			default:
 				System.err.println("Unsupported opcode, skipping");
 				i++;
