@@ -11,6 +11,14 @@ public class Chip8 implements Runnable{
 	 */
 	short[][] display;
 	/**
+	 * Width of the display
+	 */
+	int width;
+	/**
+	 * Height of the display
+	 */
+	int height;
+	/**
 	 * Memory<br>
 	 * (Character array because all the instructions are two bits wide)
 	 */
@@ -29,18 +37,42 @@ public class Chip8 implements Runnable{
 	 *(that's why this is an char array and not a byte array)
 	 */
 	char[] stack;
+	int stackPointer;
 	public Chip8(){
 		i = 200;
-		display = new short[64][32];
+		width = 64;
+		height = 32;
+		display = new short[width][height];
 		memory = new char[0xFFF];
 		registers = new byte[16];
 		stack = new char[16];
+		stackPointer = -1; //Initialised to -1 since it is 0-indexed
 	}
 	
 	public void run() {
-		char ins = (char) (memory[i] << 8 | memory[i+1]);
 		while(!Thread.currentThread().isInterrupted()){
-			
+			switch(memory[i] & (0xF<<12)){
+			case 0x0000:
+				//0x0nnn means jump to machine code at address nnn but like most modern interpreters, we'll just ignore it.
+				if(memory[i] == 0x00E0){ //Clear display
+					display = new short[width][height];
+					//Display.redraw();//Disabled for now since we do not have a display
+					i++;
+				} else if(memory[i] == 0x00EE){//Return from subroutine
+					try{
+						i = stack[stackPointer--];
+					} catch(ArrayIndexOutOfBoundsException aioobe){
+						System.err.println("Pogram tried to return from non-existent subroutine, skipping.");
+						i++;
+					}
+				}
+				break;
+			case 0x1000://1nnn: Jump to address nnn
+				i = memory[i] & 0x0FFF;
+				break;
+			case 0x2000:
+				break;
+			}
 		}
 	}
 
