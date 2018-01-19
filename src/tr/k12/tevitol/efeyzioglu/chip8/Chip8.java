@@ -1,4 +1,4 @@
-package tr.k12.tevitol.efeyzioglu;
+package tr.k12.tevitol.efeyzioglu.chip8;
 
 public class Chip8 implements Runnable{
 	/**
@@ -13,11 +13,11 @@ public class Chip8 implements Runnable{
 	/**
 	 * Width of the display
 	 */
-	int width;
+	private int width;
 	/**
 	 * Height of the display
 	 */
-	int height;
+	private int height;
 	/**
 	 * Memory<br>
 	 * (Character array because all the instructions are two bits wide)
@@ -43,9 +43,9 @@ public class Chip8 implements Runnable{
 	int stackPointer;
 	public Chip8(){
 		i = 200;
-		width = 64;
-		height = 32;
-		display = new short[width][height];
+		setWidth(64);
+		setHeight(32);
+		display = new short[getWidth()][getHeight()];
 		memory = new char[0xFFF];
 		registers = new byte[16];
 		stack = new char[16];
@@ -58,8 +58,8 @@ public class Chip8 implements Runnable{
 			case 0x0000:
 				//0x0nnn means jump to machine code at address nnn but like most modern interpreters, we'll just ignore it.
 				if(memory[i] == 0x00E0){ //Clear display
-					display = new short[width][height];
-					//Display.redraw();//Disabled for now since we do not have a display
+					display = new short[getWidth()][getHeight()];
+					Main.getFrame().repaint();
 					i++;
 				} else if(memory[i] == 0x00EE){//Return from subroutine
 					try{
@@ -132,11 +132,20 @@ public class Chip8 implements Runnable{
 					registers[(memory[i] & 0x0F00) >> 8] = (byte) sum;
 					i++;
 					break;
+				case 5://8xy5: Decrement Vx by Vy, if borrow clear VF, otherwise set VF to 1
+					byte diff = (byte) (registers[(memory[i] & 0x0F00) >> 8] - registers[(memory[i] & 0x00F0) >> 4]);
+					registers[(memory[i] & 0x0F00) >> 8] = (byte) ((diff > 0) ? diff : -diff);
+					registers[0xF] = (registers[(memory[i] & 0x0F00) >> 8] > registers[(memory[i] & 0x00F0) >> 4])? (byte) 0b11111111 : (byte) 0b0;
+					break;
 				default:
 					System.err.println("Unsupported opcode, skipping");
 					i++;
 					break;
 				}
+				break;
+				
+			case 0x9000:
+				
 				break;
 			default:
 				System.err.println("Unsupported opcode, skipping");
@@ -144,6 +153,22 @@ public class Chip8 implements Runnable{
 				break;
 			}
 		}
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 }
