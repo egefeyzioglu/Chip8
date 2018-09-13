@@ -132,7 +132,7 @@ public class Chip8 implements Runnable{
 					registers[(memory[i] & 0x0F00) >> 8] = (byte) sum;
 					i++;
 					break;
-				case 5://8xy5: Decrement Vx by Vy, if borrow clear VF, otherwise set VF to 1
+				case 5://8xy5: Decrement Vx by Vy, if borrow, clear VF, otherwise set VF to 1
 					byte diff = (byte) (registers[(memory[i] & 0x0F00) >> 8] - registers[(memory[i] & 0x00F0) >> 4]);
 					registers[(memory[i] & 0x0F00) >> 8] = (byte) ((diff > 0) ? diff : -diff);
 					registers[0xF] = (registers[(memory[i] & 0x0F00) >> 8] > registers[(memory[i] & 0x00F0) >> 4])? (byte) 0b11111111 : (byte) 0b0;
@@ -144,7 +144,14 @@ public class Chip8 implements Runnable{
 				}
 				break;
 				
-			case 0x9000:
+			case 0x9000://9xy0: Skip next instruction if Vx != Vy
+				if(registers[(memory[i] & 0x0F00)>>8] == registers[(memory[i] & 0x00F0) >> 4]) {
+					i++;
+				} else {
+					i+=2;
+				}
+				break;
+			case 0xA000:
 				
 				break;
 			default:
