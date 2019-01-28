@@ -63,6 +63,10 @@ public class Chip8 implements Runnable{
 		I = 0;
 	}
 	
+	public char[] getMemory() {
+		return memory;
+	}
+	
 	public void loadFromStorage(String path) throws IOException {
 		FileInputStream fis = new FileInputStream(path);
 		int c;
@@ -81,6 +85,14 @@ public class Chip8 implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if(Main.enableMemoryView) {
+				Main.enableMemoryView = false;
+				Main.setupMemoryView();
+			}
+			
+			
+			
+			
 			System.out.println("Current memory pointer is " + Integer.toHexString(i));
 			System.out.println(Integer.toHexString(memory[i] & (0xF<<12)));
 			switch(memory[i] & (0xF<<12)){
