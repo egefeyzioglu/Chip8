@@ -3,6 +3,7 @@ package tr.k12.tevitol.efeyzioglu.chip8;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Random;
 
 public class Chip8 implements Runnable{
 	/**
@@ -45,7 +46,12 @@ public class Chip8 implements Runnable{
 	 */
 	char[] stack;
 	int stackPointer;
+	short I; //The I Register
+	
+	Random random;
+	
 	public Chip8(){
+		random = new Random();
 		i = 200;
 		setWidth(64);
 		setHeight(32);
@@ -54,6 +60,7 @@ public class Chip8 implements Runnable{
 		registers = new byte[16];
 		stack = new char[16];
 		stackPointer = -1; //Initialised to -1 since it is 0-indexed
+		I = 0;
 	}
 	
 	public void loadFromStorage(String path) throws IOException {
@@ -174,8 +181,16 @@ public class Chip8 implements Runnable{
 					i+=2;
 				}
 				break;
-			case 0xA000:
-				
+			case 0xA000://Annn: Set the I register to nnn
+				I = (short) (memory[i] & 0x0FFF);
+				i++;
+				break;
+			case 0xB000://Bnnn: Jump to V0 + nnn
+				i = (memory[i] & 0x0FFF) + registers[0];
+				break;
+			case 0xC000://Cxkk: Set Vx = random byte AND kk
+				registers[(memory[i] & 0x0F00)>>8] = (byte) ((byte) random.nextInt(0x100) & (memory[i] & 0x00FF));
+				i++;
 				break;
 			default:
 				System.err.println("Unsupported opcode, skipping");
