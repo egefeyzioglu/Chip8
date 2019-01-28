@@ -1,5 +1,9 @@
 package tr.k12.tevitol.efeyzioglu.chip8;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public class Chip8 implements Runnable{
 	/**
 	 * Program counter
@@ -52,8 +56,26 @@ public class Chip8 implements Runnable{
 		stackPointer = -1; //Initialised to -1 since it is 0-indexed
 	}
 	
+	public void loadFromStorage(String path) throws IOException {
+		FileInputStream fis = new FileInputStream(path);
+		int c;
+		int index = 0;
+		while((c = fis.read()) != -1) {
+			memory[index++] = (char) c;
+		}
+		fis.close();
+	}
+	
 	public void run() {
 		while(!Thread.currentThread().isInterrupted()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Current memory pointer is " + Integer.toHexString(i));
+			System.out.println(Integer.toHexString(memory[i] & (0xF<<12)));
 			switch(memory[i] & (0xF<<12)){
 			case 0x0000:
 				//0x0nnn means jump to machine code at address nnn but like most modern interpreters, we'll just ignore it.
@@ -103,6 +125,7 @@ public class Chip8 implements Runnable{
 				
 			case 0x6000://6xkk: Load kk into Vx
 				registers[(memory[i] & 0x0F00) >> 8] = (byte) (memory[i] & 0x00FF);
+				System.out.println("debug lol");
 				i++;
 				break;
 				

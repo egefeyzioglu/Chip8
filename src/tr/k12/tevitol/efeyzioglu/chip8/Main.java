@@ -1,5 +1,7 @@
 package tr.k12.tevitol.efeyzioglu.chip8;
 
+import java.io.IOException;
+
 import tr.k12.tevitol.efeyzioglu.chip8.display.ChipFrame;
 
 public class Main {
@@ -10,6 +12,12 @@ public class Main {
 	public static void main(String[] args){
 		Chip8 chip8 = new Chip8();
 		setFrame(new ChipFrame(title, chip8));
+		try {
+			chip8.loadFromStorage("D:\\pong2.c8");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		chip8.run();
 	}
 
