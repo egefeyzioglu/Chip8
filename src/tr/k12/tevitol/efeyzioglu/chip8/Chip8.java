@@ -52,7 +52,7 @@ public class Chip8 implements Runnable{
 	
 	public Chip8(){
 		random = new Random();
-		i = 200;
+		i = 0x200;
 		setWidth(64);
 		setHeight(32);
 		display = new short[getWidth()][getHeight()];
@@ -61,6 +61,9 @@ public class Chip8 implements Runnable{
 		stack = new char[16];
 		stackPointer = -1; //Initialised to -1 since it is 0-indexed
 		I = 0;
+		for(int temp = 0; temp < registers.length; temp++) {
+			registers[temp] = 0;
+		}
 	}
 	
 	public char[] getMemory() {
@@ -70,7 +73,7 @@ public class Chip8 implements Runnable{
 	public void loadFromStorage(String path) throws IOException {
 		FileInputStream fis = new FileInputStream(path);
 		int c;
-		int index = 0;
+		int index = 0x200;
 		while((c = fis.read()) != -1) {
 			memory[index++] = (char) c;
 		}
